@@ -12,6 +12,10 @@ body { display:flex; height:100dvh; background-color:var(--bg-main); color:var(-
 button,.chat-item,.btn-tools-select,.tools-dropdown-menu div{-webkit-tap-highlight-color:transparent!important;touch-action:manipulation;}
 .message-content, .code-body, .biz-opt input, .input-group input, .input-group textarea { -webkit-user-select: text; user-select: text; }
 
+/* ФИКС МОБИЛЬНЫХ НАЖАТИЙ */
+button * { pointer-events: none; }
+button { -webkit-tap-highlight-color: transparent !important; }
+
 #sidebar{width:260px;background-color:var(--bg-sidebar);display:flex;flex-direction:column;flex-shrink:0;z-index:1000;position:relative;transition:transform 0.3s ease}
 .sidebar-top{padding:15px 15px 5px 15px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 #sundeek-logo{font-size:22px;font-weight:600;letter-spacing:-0.5px;color:#fff;cursor:pointer;display:inline-flex;align-items:center; -webkit-tap-highlight-color:transparent;}
@@ -171,7 +175,7 @@ body.liquid-glass .user-msg .message-content, body.liquid-glass .tr-card { backg
 #sidebar.open{left:0}
 .close-sidebar-btn{display:block}
 .hamburger-btn{display:block; position:relative; z-index:1000;}
-.header-logo svg{display:none} 
+.header-logo svg, .header-logo img {display:none} 
 #chat-header{padding:10px 15px;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(33,33,33,.95);backdrop-filter:blur(10px); position:relative; z-index:100;} 
 .header-right{gap:5px; position:relative; z-index:1000;}
 .header-btn{padding:6px 12px;font-size:13px} 
@@ -257,9 +261,9 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
                 <div id="admin-users-list" style="max-height:200px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;"></div>
             </div>
             <div id="tab-settings" style="display:none;">
-                <p style="font-size: 13px; color: #ef4444; margin-bottom: 15px;">Вставьте свой API-ключ DeepSeek сюда.</p>
+                <p style="font-size: 13px; color: #ef4444; margin-bottom: 15px;">Вставьте ссылку на ваш сервер Koyeb (вместе с /ask).</p>
                 <div class="input-group"><label>Новый пароль от админки:</label><input type="password" id="new-admin-pass"></div>
-                <div class="input-group"><label>API Ключ DeepSeek:</label><input type="text" id="admin-api-key" placeholder="sk-..."></div>
+                <div class="input-group"><label>URL Бэкенда (Koyeb):</label><input type="text" id="admin-backend-url" placeholder="https://tvoy-server.koyeb.app/ask"></div>
                 <button class="btn-primary" onclick="saveAdminSettings()">Сохранить настройки</button>
             </div>
             <button class="btn-secondary" onclick="closeModal('admin-promo-modal')" style="margin-top:15px;">Закрыть</button>
@@ -305,12 +309,8 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
 
     <aside id="sidebar">
         <div class="sidebar-top">
-            <!-- ТОТ САМЫЙ ИДЕАЛЬНЫЙ ЗОЛОТОЙ ВЕКТОР -->
             <div id="sundeek-logo" onclick="handleLogoClick()">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right:10px; flex-shrink: 0;">
-                    <path d="M18 7 A 6 6 0 0 0 6 7 C 6 13 18 11 18 17 A 6 6 0 0 1 6 17" stroke="#D4AF37" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-                    <path d="M15 7 A 3 3 0 0 0 9 7 C 9 11 15 13 15 17 A 3 3 0 0 1 9 17" stroke="#D4AF37" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-                </svg>
+                <img src="logo.png" alt="sundeek logo" style="width:28px; height:28px; margin-right:10px; flex-shrink: 0; object-fit: contain;" onerror="this.outerHTML='<svg width=\'28\' height=\'28\' viewBox=\'0 0 24 24\' fill=\'none\' style=\'margin-right:10px; flex-shrink: 0;\'><path d=\'M18 7 A 6 6 0 0 0 6 7 C 6 13 18 11 18 17 A 6 6 0 0 1 6 17\' stroke=\'#D4AF37\' stroke-width=\'2.5\' stroke-linecap=\'round\' fill=\'none\'/><path d=\'M15 7 A 3 3 0 0 0 9 7 C 9 11 15 13 15 17 A 3 3 0 0 1 9 17\' stroke=\'#D4AF37\' stroke-width=\'2.5\' stroke-linecap=\'round\' fill=\'none\'/></svg>'">
                 sundeek
             </div>
             <button class="close-sidebar-btn" onclick="toggleMobileSidebar()">×</button>
@@ -342,12 +342,8 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
         <div id="chat-header">
             <div class="header-left">
                 <button class="hamburger-btn" onclick="toggleMobileSidebar()">☰</button>
-                <!-- ТОТ САМЫЙ ИДЕАЛЬНЫЙ ЗОЛОТОЙ ВЕКТОР -->
                 <div class="header-logo" onclick="handleLogoClick()">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right:8px; flex-shrink: 0;">
-                        <path d="M18 7 A 6 6 0 0 0 6 7 C 6 13 18 11 18 17 A 6 6 0 0 1 6 17" stroke="#D4AF37" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-                        <path d="M15 7 A 3 3 0 0 0 9 7 C 9 11 15 13 15 17 A 3 3 0 0 1 9 17" stroke="#D4AF37" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-                    </svg>
+                    <img src="logo.png" alt="sundeek logo" style="width:28px; height:28px; margin-right:8px; flex-shrink: 0; object-fit: contain;" onerror="this.outerHTML='<svg width=\'28\' height=\'28\' viewBox=\'0 0 24 24\' fill=\'none\' style=\'margin-right:8px; flex-shrink: 0;\'><path d=\'M18 7 A 6 6 0 0 0 6 7 C 6 13 18 11 18 17 A 6 6 0 0 1 6 17\' stroke=\'#D4AF37\' stroke-width=\'2.5\' stroke-linecap=\'round\' fill=\'none\'/><path d=\'M15 7 A 3 3 0 0 0 9 7 C 9 11 15 13 15 17 A 3 3 0 0 1 9 17\' stroke=\'#D4AF37\' stroke-width=\'2.5\' stroke-linecap=\'round\' fill=\'none\'/></svg>'">
                     sundeek
                 </div>
             </div>
@@ -401,7 +397,7 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
 
     <script>
         let currentEnvContext = "";
-        let DEEPSEEK_API_KEY = ""; 
+        let BACKEND_URL = ""; 
 
         const firebaseConfig = { 
             apiKey: "AIzaSyCmKM0PmsvxST_cy9q4P388o3tqRsvCKHM", 
@@ -429,11 +425,11 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
         function fetchEnvironmentSilently() {
             const now = new Date(); const dateStr = now.toLocaleDateString(currentLang === 'ru' ? 'ru-RU' : 'en-US'); const timeStr = now.toLocaleTimeString(currentLang === 'ru' ? 'ru-RU' : 'en-US', { hour: '2-digit', minute: '2-digit' });
             currentEnvContext = currentLang === 'ru' ? `[СЕКРЕТНАЯ ИНФОРМАЦИЯ: Сегодня ${dateStr}, время ${timeStr}.]` : `[SECRET INFO: Today is ${dateStr}, time is ${timeStr}.]`;
-            db.collection("settings").doc("admin").get().then(doc => { if (doc.exists && doc.data().apiKey) { DEEPSEEK_API_KEY = doc.data().apiKey; } }).catch(e => {});
+            db.collection("settings").doc("admin").get().then(doc => { if (doc.exists && doc.data().backendUrl) { BACKEND_URL = doc.data().backendUrl; } }).catch(e => {});
         }
 
         const DICTIONARY = {
-            ru: { newChat: "+ Новый чат", promoTitle: "Адаптированные ответы", promoDesc: "Войдите, чтобы сохранять историю и использовать продвинутые ИИ-модели.", login: "Войти", signup: "Регистрация", emptyChat: "Что сегодня в повестке дня?", phChat: "Спросите sundeek...", phImg: "Подробно опишите, что нужно нарисовать...", phCustomPrompt: "Например: Отвечай всегда как пират...", optChat: "Чат с ИИ", optImg: "Создание изображений", tierTitle: "Активация тарифа", activate: "Активировать", cancel: "Отмена", loginTitle: "Вход в систему", codeSent: "Код отправлен на почту", confirm: "Подтвердить", settingsTitle: "Настройки ИИ", emojiLabel: "Использование смайликов:", promptLabel: "Поправительный промпт (фоновые инструкции):", saveSet: "Сохранить настройки", btnSet: "Настройки ИИ", addTier: "Добавить тариф", logout: "Выйти", tWord: "Тариф:", txWord: "Текст:", iWord: "Картинки:", cWord: "Чаты:", em0: "0% (Строго без эмодзи)", em10: "10% (Редко)", em40: "40% (Сбалансированно)", em60: "60% (Часто)", em80: "80% (Очень много)", sysPromptTranslate: "You are a strict translator for an image generator. Translate the user's request into English. Output ONLY the final English text.", sysPromptBase: "Ты высокоинтеллектуальный ИИ-ассистент sundeek. Давай подробные, точные и актуальные ответы. Отвечай на русском. Если просят перевести слово, отвечай СТРОГО: [TR]Оригинал|Перевод|Слово|Перевод[/TR]. Пример: [TR]Русский|Английский|арбуз|watermelon[/TR].", optLive: "Голосовой чат", liveCall: "Позвонить", liveListen: "Слушаю...", liveMuted: "Микрофон выключен", liveGreeting: "Привет! Я слушаю тебя.", locLabel: "Ваш адрес (город) для погоды:", liveThinking: "ИИ думает...", liveSpeaking: "ИИ говорит...", phEmail: "Адрес электронной почты", phCode: "Введите код (6 цифр)", btnDownload: "Скачать файл", btnClose: "Закрыть", phPromo: "Введите ключ тарифа", glassLabel: "Режим Liquid Glass (эффект стекла):", glassOff: "Выключен", glassOn: "Включен (Pro+)", myinfoTitle: "Моя информация", nameLabel: "Ваше имя (как к вам обращаться):", bioLabel: "Узнай меня (напишите всё о себе):", openMyInfo: "👤 MY INFO", saveInfo: "Сохранить", backInfo: "Назад" },
+            ru: { newChat: "+ Новый чат", promoTitle: "Адаптированные ответы", promoDesc: "Войдите, чтобы сохранять историю и использовать продвинутые ИИ-модели.", login: "Войти", signup: "Регистрация", emptyChat: "Что сегодня в повестке дня?", phChat: "Спросите sundeek...", phImg: "Подробно опишите, что нужно нарисовать...", phCustomPrompt: "Например: Отвечай всегда как пират...", optChat: "Чат с ИИ", optImg: "Создание изображений", tierTitle: "Активация тарифа", activate: "Активировать", cancel: "Отмена", loginTitle: "Вход в систему", codeSent: "Код отправлен на почту", confirm: "Подтвердить", settingsTitle: "Настройки ИИ", emojiLabel: "Использование смайликов:", promptLabel: "Поправительный промпт (фоновые инструкции):", saveSet: "Сохранить настройки", btnSet: "Настройки ИИ", addTier: "Добавить тариф", logout: "Выйти", tWord: "Тариф:", txWord: "Текст:", iWord: "Картинки:", cWord: "Чаты:", em0: "0% (Строго без эмодзи)", em10: "10% (Редко)", em40: "40% (Сбалансированно)", em60: "60% (Часто)", em80: "80% (Очень много)", sysPromptTranslate: "You are a strict translator for an image generator. Translate the user's request into English. Output ONLY the final English text.", sysPromptBase: "Ты высокоинтеллектуальный ИИ-ассистент sundeek. Давай подробные, точные и актуальные ответы. Отвечай на русском. Если просят перевести слово, отвечай СТРОГО: [TR]Русский|Английский|арбуз|watermelon[/TR]. Пример: [TR]Русский|Английский|арбуз|watermelon[/TR].", optLive: "Голосовой чат", liveCall: "Позвонить", liveListen: "Слушаю...", liveMuted: "Микрофон выключен", liveGreeting: "Привет! Я слушаю тебя.", locLabel: "Ваш адрес (город) для погоды:", liveThinking: "ИИ думает...", liveSpeaking: "ИИ говорит...", phEmail: "Адрес электронной почты", phCode: "Введите код (6 цифр)", btnDownload: "Скачать файл", btnClose: "Закрыть", phPromo: "Введите ключ тарифа", glassLabel: "Режим Liquid Glass (эффект стекла):", glassOff: "Выключен", glassOn: "Включен (Pro+)", myinfoTitle: "Моя информация", nameLabel: "Ваше имя (как к вам обращаться):", bioLabel: "Узнай меня (напишите всё о себе):", openMyInfo: "👤 MY INFO", saveInfo: "Сохранить", backInfo: "Назад" },
             en: { newChat: "+ New chat", promoTitle: "Tailored responses", promoDesc: "Log in to save history and use advanced AI models.", login: "Log in", signup: "Sign up", emptyChat: "What's on the agenda today?", phChat: "Ask sundeek...", phImg: "Describe in detail what to draw...", phCustomPrompt: "e.g., Always answer like a pirate...", optChat: "AI Chat", optImg: "Image Generation", tierTitle: "Activate Plan", activate: "Activate", cancel: "Cancel", loginTitle: "Log in", codeSent: "Code sent to email", confirm: "Confirm", settingsTitle: "AI Settings", emojiLabel: "Emoji usage:", promptLabel: "Custom background prompt:", saveSet: "Save settings", btnSet: "AI Settings", addTier: "Add Plan", logout: "Log out", tWord: "Plan:", txWord: "Text:", iWord: "Images:", cWord: "Chats:", em0: "0% (Strictly no emojis)", em10: "10% (Rarely)", em40: "40% (Balanced)", em60: "60% (Often)", em80: "80% (A lot)", sysPromptTranslate: "You are a strict translator for an image generator. Output ONLY the final English text.", sysPromptBase: "You are a highly intelligent AI assistant sundeek. Provide detailed, accurate, and analytical answers. Answer in English. If the user asks to translate a word or short phrase, output EXACTLY in this format: [TR]Source Language|Target Language|Original Text|Translated Text[/TR].", optLive: "Voice Chat", liveCall: "Call", liveListen: "Listening...", liveMuted: "Microphone muted", liveGreeting: "Hi! I am listening.", locLabel: "Your address (city) for weather:", liveThinking: "AI is thinking...", liveSpeaking: "AI is speaking...", phEmail: "Email address", phCode: "Enter code (6 digits)", btnDownload: "Download file", btnClose: "Close", phPromo: "Enter tier key", glassLabel: "Liquid Glass mode (blur effect):", glassOff: "Off", glassOn: "On (Pro+)", myinfoTitle: "My Info", nameLabel: "Your name (how to address you):", bioLabel: "Get to know me (write about yourself):", openMyInfo: "👤 MY INFO", saveInfo: "Save", backInfo: "Back" }
         };
 
@@ -589,10 +585,10 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
 
         async function checkAdminPassword() {
             const inputPass = document.getElementById('admin-pass-input').value;
-            try { const doc = await db.collection("settings").doc("admin").get(); const realPass = doc.exists ? doc.data().password : "123456"; if (!doc.exists) await db.collection("settings").doc("admin").set({ password: "123456" }); if (inputPass === realPass) { document.getElementById('admin-pass-input').value = ''; document.getElementById('admin-api-key').value = doc.exists && doc.data().apiKey ? doc.data().apiKey : ''; closeModal('admin-auth-modal'); openModal('admin-promo-modal'); cleanupExpiredCodes(); fetchUsersStats(); } else { alert("Error"); } } catch (e) { alert("Ошибка БД: " + e.message); }
+            try { const doc = await db.collection("settings").doc("admin").get(); const realPass = doc.exists ? doc.data().password : "123456"; if (!doc.exists) await db.collection("settings").doc("admin").set({ password: "123456" }); if (inputPass === realPass) { document.getElementById('admin-pass-input').value = ''; document.getElementById('admin-backend-url').value = doc.exists && doc.data().backendUrl ? doc.data().backendUrl : ''; closeModal('admin-auth-modal'); openModal('admin-promo-modal'); cleanupExpiredCodes(); fetchUsersStats(); } else { alert("Error"); } } catch (e) { alert("Ошибка БД: " + e.message); }
         }
         
-        async function saveAdminSettings() { const newPass = document.getElementById('new-admin-pass').value; const newApiKey = document.getElementById('admin-api-key').value.trim(); let updates = {}; if (newPass.length >= 4) updates.password = newPass; updates.apiKey = newApiKey; DEEPSEEK_API_KEY = newApiKey; await db.collection("settings").doc("admin").set(updates, { merge: true }); document.getElementById('new-admin-pass').value = ''; alert("Сохранено!"); }
+        async function saveAdminSettings() { const newPass = document.getElementById('new-admin-pass').value; const newBackendUrl = document.getElementById('admin-backend-url').value.trim(); let updates = {}; if (newPass.length >= 4) updates.password = newPass; updates.backendUrl = newBackendUrl; BACKEND_URL = newBackendUrl; await db.collection("settings").doc("admin").set(updates, { merge: true }); document.getElementById('new-admin-pass').value = ''; alert("Сохранено!"); }
 
         function switchAdminTab(tab) { document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.querySelector(`button[onclick="switchAdminTab('${tab}')"]`).classList.add('active'); document.getElementById('tab-promo').style.display = tab === 'promo' ? 'block' : 'none'; document.getElementById('tab-settings').style.display = tab === 'settings' ? 'block' : 'none'; document.getElementById('tab-users').style.display = tab === 'users' ? 'block' : 'none'; }
 
@@ -793,7 +789,7 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
             btn.disabled = true; input.disabled = true; isThinking = true; try { recognition.stop(); } catch(e){}
             let activeChat = chats.find(c => c.id === activeChatId); const tData = getActiveTierData();
             
-            if (!DEEPSEEK_API_KEY) { alert("Ошибка! Администратор не указал API-ключ в настройках базы."); isThinking = false; btn.disabled = false; input.disabled = false; return; }
+            if (!BACKEND_URL) { alert("Ошибка! Администратор не указал URL бэкенда в настройках базы. Пожалуйста, укажите ссылку на ваш сервер Koyeb."); isThinking = false; btn.disabled = false; input.disabled = false; return; }
 
             const emptyState = document.getElementById('empty-state'); if(emptyState) emptyState.style.display = 'none';
             if (!userBoxRef) {
@@ -812,10 +808,18 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
                 userInfo.imgCount++; saveUserInfoToFirebase(); updateTierUI();
                 try {
                     let historyContext = activeChat.messages.slice(-5).filter(m => !m.content.includes('[IMG]')).map(m => `${m.role}: ${m.content}`).join('\n');
-                    const enhancePromptMsg = [{ role: "system", content: LANG.sysPromptTranslate }, { role: "user", content: `History:\n${historyContext}\n\nRequest: ${text}` }];
+                    const enhancePromptMsg = "Сделай точный перевод этого текста на английский язык. Выведи ТОЛЬКО английский текст, он нужен для генератора картинок. Текст: " + text;
                     
-                    const dsResponse = await fetch("https://api.deepseek.com/chat/completions", { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${DEEPSEEK_API_KEY}` }, body: JSON.stringify({ model: "deepseek-chat", messages: enhancePromptMsg, temperature: 0.1 }) });
-                    const dsData = await dsResponse.json(); const enhancedPrompt = dsData.choices[0].message.content.trim();
+                    const dsResponse = await fetch(BACKEND_URL, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ message: enhancePromptMsg }) 
+                    });
+                    
+                    if (!dsResponse.ok) throw new Error("Backend connection failed");
+                    const dsData = await dsResponse.json(); 
+                    if (dsData.status === "error") throw new Error(dsData.error);
+                    const enhancedPrompt = dsData.reply.trim();
                     
                     aiLabel.innerText = 'sundeek'; 
                     
@@ -838,14 +842,13 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
                     const preloader = new Image(); preloader.src = imgUrl;
                     preloader.onload = () => { clearInterval(loadingInterval); const pEl = document.getElementById(progressId); if(pEl) pEl.innerText = `100%`; setTimeout(() => { activeChat.messages.push({ role: "assistant", content: reply }); saveChatsToFirebase(); aiBox.innerHTML = ''; renderAIResponseFast(reply, aiBox); updateInputUI(activeChat); isThinking = false; btn.disabled = false; input.disabled = false; input.focus(); checkInput(); }, 300); };
                     preloader.onerror = () => { clearInterval(loadingInterval); aiBox.innerHTML = '<span>Error</span>'; updateInputUI(activeChat); isThinking = false; btn.disabled = false; input.disabled = false; input.focus(); checkInput(); aiLabel.innerText = 'sundeek'; };
-                } catch (e) { isThinking = false; btn.disabled = false; input.disabled = false; aiLabel.innerText = 'sundeek'; } return;
+                } catch (e) { aiBox.innerText = "Ошибка Бэкенда: " + e.message; isThinking = false; btn.disabled = false; input.disabled = false; aiLabel.innerText = 'sundeek'; } return;
             }
 
             userInfo.msgCount++; saveUserInfoToFirebase(); updateTierUI();
 
             if (currentTool === 'live' && isLiveActive) { const statusEl = document.getElementById('live-status-indicator'); statusEl.classList.remove('speaking'); statusEl.classList.add('thinking'); document.getElementById('lang-live-listen').innerText = LANG.liveThinking; }
 
-            const modelName = tData.hasReasoning ? "deepseek-reasoner" : "deepseek-chat";
             let dynamicSystemPrompt = LANG.sysPromptBase; let reminderPrompt = ""; 
             
             if (currentTool === 'live') dynamicSystemPrompt = currentLang === 'ru' ? "Ты ИИ в звонке. Отвечай кратко." : "AI on call. Be brief.";
@@ -859,48 +862,43 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
                 if (userInfo.customPrompt) dynamicSystemPrompt += ` Rule: ${userInfo.customPrompt}`;
             }
 
-            const cleanMessages = activeChat.messages.map((m, index) => { let cleanContent = m.content.replace(/\[IMG\].*?\[\/IMG\]/g, "[Image]"); if (index === 0 && m.role === "system") cleanContent = dynamicSystemPrompt; return { role: m.role, content: cleanContent }; });
-            if (reminderPrompt !== "" && currentTool !== 'live') { const lastIdx = cleanMessages.length - 1; if (cleanMessages[lastIdx].role === "user") { cleanMessages[lastIdx].content += `\n\n[Reminder: ${reminderPrompt}]`; } }
+            let fullContextString = `System Instructions: ${dynamicSystemPrompt}\n\n`;
+            activeChat.messages.forEach(m => {
+                if (m.role !== "system") {
+                    fullContextString += `${m.role}: ${m.content}\n\n`;
+                }
+            });
+            fullContextString += "assistant: ";
 
             let fullReply = ""; 
             
             try {
-                const response = await fetch("https://api.deepseek.com/chat/completions", { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${DEEPSEEK_API_KEY}` }, body: JSON.stringify({ model: modelName, messages: cleanMessages, temperature: tData.temp, stream: true }) });
-                if (!response.ok) throw new Error("API Limit or Error");
-                const reader = response.body.getReader(); const decoder = new TextDecoder("utf-8");
-                aiBox.innerHTML = ''; const tempSpan = document.createElement('span'); aiBox.appendChild(tempSpan);
+                const response = await fetch(BACKEND_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ message: fullContextString }) 
+                });
                 
-                let buffer = ""; let isFirstChunk = true;
+                if (!response.ok) throw new Error("Backend Connection Error");
+                
+                const data = await response.json();
+                if (data.status === "error") throw new Error(data.error);
+                
+                fullReply = data.reply;
+                aiBox.innerHTML = ''; const tempSpan = document.createElement('span'); aiBox.appendChild(tempSpan);
 
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (isFirstChunk) { aiLabel.innerText = 'sundeek'; isFirstChunk = false; }
-                    if (done) break;
-
-                    buffer += decoder.decode(value, { stream: true }); const lines = buffer.split("\n"); buffer = lines.pop(); 
-                    
-                    for (const line of lines) {
-                        if (line.trim() === "data: [DONE]") break;
-                        if (line.trim().startsWith("data: ")) {
-                            try { 
-                                const parsed = JSON.parse(line.trim().replace(/^data: /, "")); const delta = parsed.choices[0].delta.content || ""; fullReply += delta; 
-
-                                let safeReply = fullReply.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                                safeReply = safeReply.replace(/\[TR\](.*?)\|(.*?)\|(.*?)\|(.*?)\[\/TR\]/g, '<div class="tr-card"><div class="tr-half"><div class="tr-lang">$1</div><div class="tr-word">$3</div></div><div class="tr-divider"></div><div class="tr-half"><div class="tr-lang">$2</div><div class="tr-word">$4</div></div></div>');
-                                safeReply = safeReply.replace(/\[CUR\](.*?)\|(.*?)\|(.*?)\|(.*?)\[\/CUR\]/g, '<div class="tr-card"><div class="tr-half"><div class="tr-lang">$1</div><div class="tr-word">$3</div></div><div class="tr-divider"></div><div class="tr-half"><div class="tr-lang">$2</div><div class="tr-word">$4</div></div></div>');
-                                tempSpan.innerHTML = safeReply; 
-                                document.getElementById('messages-container').scrollTop = document.getElementById('messages-container').scrollHeight; 
-                            } catch (e) {} 
-                        }
-                    }
-                }
+                let safeReply = fullReply.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                safeReply = safeReply.replace(/\[TR\](.*?)\|(.*?)\|(.*?)\|(.*?)\[\/TR\]/g, '<div class="tr-card"><div class="tr-half"><div class="tr-lang">$1</div><div class="tr-word">$3</div></div><div class="tr-divider"></div><div class="tr-half"><div class="tr-lang">$2</div><div class="tr-word">$4</div></div></div>');
+                safeReply = safeReply.replace(/\[CUR\](.*?)\|(.*?)\|(.*?)\|(.*?)\[\/CUR\]/g, '<div class="tr-card"><div class="tr-half"><div class="tr-lang">$1</div><div class="tr-word">$3</div></div><div class="tr-divider"></div><div class="tr-half"><div class="tr-lang">$2</div><div class="tr-word">$4</div></div></div>');
+                tempSpan.innerHTML = safeReply; 
+                document.getElementById('messages-container').scrollTop = document.getElementById('messages-container').scrollHeight; 
                 
                 if (currentTool === 'live' && isLiveActive && fullReply.trim() !== "") { speakText(fullReply); }
                 
                 aiLabel.innerText = 'sundeek'; activeChat.messages.push({ role: "assistant", content: fullReply }); saveChatsToFirebase(); aiBox.innerHTML = ''; renderAIResponseFast(fullReply, aiBox); updateInputUI(activeChat); 
-            } catch (e) { aiBox.innerText = "Error API: " + e.message; aiLabel.innerText = 'sundeek'; } finally { 
+            } catch (e) { aiBox.innerText = "Error: " + e.message; aiLabel.innerText = 'sundeek'; } finally { 
                 isThinking = false; aiLabel.innerText = 'sundeek'; 
-                if (currentTool === 'live' && isLiveActive) { const statusEl = document.getElementById('live-status-indicator'); if(statusEl) statusEl.classList.remove('thinking'); if (!isSpeaking && ttsQueue.length === 0) { document.getElementById('lang-live-listen').innerText = LANG.liveListen; if (!isLiveMuted) { try { recognition.start(); } catch(e){} } } }
+                if (currentTool === 'live' && isLiveActive) { const statusEl = document.getElementById('live-status-indicator'); if(statusEl) statusEl.classList.remove('thinking'); if (!isSpeaking) { document.getElementById('lang-live-listen').innerText = LANG.liveListen; if (!isLiveMuted) { try { recognition.start(); } catch(e){} } } }
                 btn.disabled = false; input.disabled = false; input.focus(); checkInput(); 
             }
         }
