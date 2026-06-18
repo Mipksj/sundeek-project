@@ -1,4 +1,12 @@
-<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>sundeek</title><style>
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>sundeek</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script>
+    // Встроенный радар ошибок. Если будет белый экран, он покажет причину.
+    window.onerror = function(msg, url, line) { alert("ОШИБКА ЗАГРУЗКИ: " + msg + " (строка " + line + ")"); };
+</script>
+<style>
 :root{--bg-main:#212121;--bg-sidebar:#171717;--bg-input:#2f2f2f;--text-primary:#ececf1;--text-secondary:#b4b4b4;--border-color:#383838;--accent:#D4AF37}
 *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;margin:0;padding:0}
 
@@ -8,11 +16,10 @@
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
 * { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.1) transparent; }
 
-body { display:flex; height:100dvh; background-color:var(--bg-main); color:var(--text-primary); overflow:hidden; overflow-x:hidden; width:100%; -webkit-user-select: none; user-select: none; }
+body { display:flex; height:100vh; height:100dvh; background-color:var(--bg-main); color:var(--text-primary); overflow:hidden; overflow-x:hidden; width:100%; -webkit-user-select: none; user-select: none; }
 button,.chat-item,.btn-tools-select,.tools-dropdown-menu div{-webkit-tap-highlight-color:transparent!important;touch-action:manipulation;}
 .message-content, .code-body, .biz-opt input, .input-group input, .input-group textarea { -webkit-user-select: text; user-select: text; }
 
-/* ФИКС МОБИЛЬНЫХ НАЖАТИЙ */
 button * { pointer-events: none; }
 button { -webkit-tap-highlight-color: transparent !important; }
 
@@ -200,35 +207,31 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
     <div id="auth-modal" class="modal-overlay">
         <div class="modal-box" id="auth-modal-box">
             <h2 id="auth-title">Вход в систему</h2>
-            
             <div id="step-email">
                 <div class="input-group"><input type="email" id="email-input" placeholder="Адрес электронной почты"></div>
                 <button class="btn-primary" id="btn-email-next" onclick="handleEmailNext()">Продолжить</button>
             </div>
-            
             <div id="step-password" style="display: none;">
                 <p style="color: #b4b4b4; margin-bottom: 15px; font-size: 14px; text-align: center;" id="pass-msg-desc">Введите ваш пароль для входа</p>
                 <div class="input-group"><input type="password" id="auth-password" placeholder="Пароль"></div>
                 <button class="btn-primary" id="btn-login" onclick="handlePasswordLogin()">Войти</button>
                 <button class="btn-secondary" style="border:none; margin-bottom: 10px;" onclick="forgotPassword()">Забыли пароль?</button>
             </div>
-
             <div id="step-code" style="display: none;">
                 <p style="color: #b4b4b4; margin-bottom: 15px; font-size: 14px; text-align: center;">Код отправлен на почту</p>
                 <div class="input-group"><input type="text" id="code-input" placeholder="Введите код (6 цифр)" maxlength="6"></div>
                 <button class="btn-primary" onclick="handleCodeNext()">Подтвердить</button>
             </div>
-
             <div id="step-set-password" style="display: none;">
                 <p style="color: #b4b4b4; margin-bottom: 15px; font-size: 14px; text-align: center;" id="set-pass-msg">Придумайте надежный пароль</p>
                 <div class="input-group"><input type="password" id="auth-new-password" placeholder="Новый пароль (минимум 4 символа)"></div>
                 <button class="btn-primary" onclick="handleSetPassword()">Сохранить и войти</button>
             </div>
-
             <button class="btn-secondary" id="auth-close-btn" onclick="closeAuthModal()" style="margin-top: 10px;">Отмена</button>
         </div>
     </div>
 
+    <!-- ПРОЧИЕ МОДАЛКИ -->
     <div id="redeem-modal" class="modal-overlay"><div class="modal-box"><h2 id="lang-tier-title">Активация тарифа</h2><div class="input-group"><input type="text" id="promo-input" placeholder="Введите ключ тарифа"></div><button class="btn-primary" onclick="redeemPromo()" id="lang-activate">Активировать</button><button class="btn-secondary" onclick="closeModal('redeem-modal')" id="lang-cancel-3">Отмена</button></div></div>
     <div id="admin-auth-modal" class="modal-overlay"><div class="modal-box"><h2>Доступ к Promo-меню</h2><div class="input-group"><input type="password" id="admin-pass-input" placeholder="Пароль администратора"></div><button class="btn-primary" onclick="checkAdminPassword()">Войти</button><button class="btn-secondary" onclick="closeModal('admin-auth-modal')">Отмена</button></div></div>
 
@@ -394,9 +397,6 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
         </div>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script>
         let currentEnvContext = "";
         let DEEPSEEK_API_KEY = ""; 
@@ -409,7 +409,12 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
             messagingSenderId: "849823542646", 
             appId: "1:849823542646:web:5f875f92cc01d324521e57" 
         };
-        firebase.initializeApp(firebaseConfig); const db = firebase.firestore();
+        
+        let db;
+        try {
+            firebase.initializeApp(firebaseConfig); 
+            db = firebase.firestore();
+        } catch(e) { console.error("Firebase Init Error:", e); }
         
         const EMAILJS_PUBLIC_KEY = "R4vZz7b0YlLVR7PHe"; const EMAILJS_SERVICE_ID = "service_345gudin"; const EMAILJS_TEMPLATE_ID = "template_spryynf";
 
@@ -427,7 +432,7 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
         function fetchEnvironmentSilently() {
             const now = new Date(); const dateStr = now.toLocaleDateString(currentLang === 'ru' ? 'ru-RU' : 'en-US'); const timeStr = now.toLocaleTimeString(currentLang === 'ru' ? 'ru-RU' : 'en-US', { hour: '2-digit', minute: '2-digit' });
             currentEnvContext = currentLang === 'ru' ? `[СЕКРЕТНАЯ ИНФОРМАЦИЯ: Сегодня ${dateStr}, время ${timeStr}.]` : `[SECRET INFO: Today is ${dateStr}, time is ${timeStr}.]`;
-            db.collection("settings").doc("admin").get().then(doc => { if (doc.exists && doc.data().apiKey) { DEEPSEEK_API_KEY = doc.data().apiKey; } }).catch(e => {});
+            if(db) db.collection("settings").doc("admin").get().then(doc => { if (doc.exists && doc.data().apiKey) { DEEPSEEK_API_KEY = doc.data().apiKey; } }).catch(e => {});
         }
 
         const DICTIONARY = {
@@ -499,6 +504,7 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
         function showAuthStep(stepId) { ['step-email', 'step-password', 'step-code', 'step-set-password'].forEach(id => { document.getElementById(id).style.display = id === stepId ? 'block' : 'none'; }); }
 
         async function handleEmailNext() {
+            if(!db) return alert('База данных недоступна (проверьте блокировщик рекламы)');
             pendingEmail = document.getElementById('email-input').value.trim();
             if (!pendingEmail.includes('@')) return alert('Введите корректный Email');
             
@@ -561,9 +567,10 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
 
         function saveMyInfo() { userInfo.userName = document.getElementById('user-name-input').value.trim(); userInfo.userBio = document.getElementById('user-bio-input').value.trim(); saveUserInfoToFirebase(); closeModal('my-info-modal'); openModal('user-settings-modal'); }
 
-        async function cleanupExpiredCodes() { try { const snapshot = await db.collection("promo_codes").where("used", "==", false).get(); const now = Date.now(); const batch = db.batch(); let deletedCount = 0; snapshot.forEach(doc => { const data = doc.data(); const created = data.createdAt || 0; if (now - created > 90 * 24 * 60 * 60 * 1000) { batch.delete(doc.ref); deletedCount++; } }); if(deletedCount > 0) await batch.commit(); } catch(e) {} }
+        async function cleanupExpiredCodes() { if(!db) return; try { const snapshot = await db.collection("promo_codes").where("used", "==", false).get(); const now = Date.now(); const batch = db.batch(); let deletedCount = 0; snapshot.forEach(doc => { const data = doc.data(); const created = data.createdAt || 0; if (now - created > 90 * 24 * 60 * 60 * 1000) { batch.delete(doc.ref); deletedCount++; } }); if(deletedCount > 0) await batch.commit(); } catch(e) {} }
 
         async function fetchUsersStats() {
+            if(!db) return;
             try { const snapshot = await db.collection("users").get(); allUsersCache = []; let onlineNow = 0; let onlineToday = 0; const now = Date.now(); const startOfDay = new Date().setHours(0,0,0,0); snapshot.forEach(doc => { const data = doc.data(); data.email = doc.id; allUsersCache.push(data); const lastActive = data.lastActive || 0; if (now - lastActive < 5 * 60 * 1000) onlineNow++; if (lastActive > startOfDay) onlineToday++; }); document.getElementById('stat-online-now').innerText = onlineNow; document.getElementById('stat-online-today').innerText = onlineToday; } catch(e){}
         }
 
@@ -586,11 +593,13 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
         function handleLogoClick() { logoClicks++; clearTimeout(logoClickTimer); if (logoClicks >= 10) { logoClicks = 0; openModal('admin-auth-modal'); } else { logoClickTimer = setTimeout(() => logoClicks = 0, 3000); } }
 
         async function checkAdminPassword() {
+            if(!db) return alert('БД недоступна');
             const inputPass = document.getElementById('admin-pass-input').value;
             try { const doc = await db.collection("settings").doc("admin").get(); const realPass = doc.exists ? doc.data().password : "123456"; if (!doc.exists) await db.collection("settings").doc("admin").set({ password: "123456" }); if (inputPass === realPass) { document.getElementById('admin-pass-input').value = ''; document.getElementById('admin-api-key').value = doc.exists && doc.data().apiKey ? doc.data().apiKey : ''; closeModal('admin-auth-modal'); openModal('admin-promo-modal'); cleanupExpiredCodes(); fetchUsersStats(); } else { alert("Error"); } } catch (e) { alert("Ошибка БД: " + e.message); }
         }
         
         async function saveAdminSettings() { 
+            if(!db) return;
             const newPass = document.getElementById('new-admin-pass').value; 
             const newApiKey = document.getElementById('admin-api-key').value.trim(); 
             let updates = {}; 
@@ -605,6 +614,7 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
         function switchAdminTab(tab) { document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.querySelector(`button[onclick="switchAdminTab('${tab}')"]`).classList.add('active'); document.getElementById('tab-promo').style.display = tab === 'promo' ? 'block' : 'none'; document.getElementById('tab-settings').style.display = tab === 'settings' ? 'block' : 'none'; document.getElementById('tab-users').style.display = tab === 'users' ? 'block' : 'none'; }
 
         async function generatePromoCode() {
+            if(!db) return;
             const tier = document.getElementById('promo-tier-select').value; const days = parseInt(document.getElementById('promo-days-input').value); const key = "SUNDEEK-" + Math.random().toString(36).substr(2, 8).toUpperCase(); let customData = null;
             if (tier === 'bissnes') { customData = { msgs: parseInt(document.getElementById('biz-msgs').value) || 0, images: parseInt(document.getElementById('biz-imgs').value) || 0, chats: parseInt(document.getElementById('biz-chats').value) || 0, hasSettings: document.getElementById('biz-settings').checked, hasGlass: document.getElementById('biz-glass').checked, name: "Business" }; }
             const expiresAt = Date.now() + (90 * 24 * 60 * 60 * 1000); await db.collection("promo_codes").doc(key).set({ tier: tier, days: days, used: false, usedBy: null, createdAt: Date.now(), expiresAt: expiresAt, customData: customData }); const box = document.getElementById('generated-code-box'); box.style.display = 'block'; box.innerText = key;
@@ -612,6 +622,7 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
         function copyPromoCode(element) { const code = element.innerText; if (code === 'Скопировано!') return; navigator.clipboard.writeText(code); element.innerText = 'Скопировано!'; setTimeout(() => { element.innerText = code; }, 1500); }
 
         async function redeemPromo() {
+            if(!db) return;
             const code = document.getElementById('promo-input').value.trim(); if (!code) return; const docRef = db.collection("promo_codes").doc(code);
             try {
                 const doc = await docRef.get(); if (!doc.exists) return alert("Key not found"); const data = doc.data(); if (data.used) return alert("Key already used");
@@ -622,11 +633,11 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
 
         function logout() { currentUserEmail = null; chats = []; activeChatId = null; localStorage.removeItem('sundeek_user_email'); localStorage.removeItem('sundeek_chats_backup'); document.getElementById('user-profile').style.display = 'none'; document.getElementById('sidebar-promo').style.display = 'block'; document.getElementById('header-auth-buttons').style.display = 'flex'; document.getElementById('messages-container').innerHTML = `<div id="empty-state"><h1>${LANG.emptyChat}</h1></div>`; document.getElementById('chat-list').innerHTML = ''; userInfo.liquidGlass = false; applyLiquidGlass(); createNewChat(); }
 
-        function saveUserInfoToFirebase() { if(!currentUserEmail || isGhostMode) return; userInfo.lastActive = Date.now(); db.collection("users").doc(currentUserEmail).set({ uid: userInfo.uid, tier: userInfo.tier, msgCount: userInfo.msgCount, imgCount: userInfo.imgCount, lastMsgDate: userInfo.lastMsgDate, expireDate: userInfo.expireDate, emojiLevel: userInfo.emojiLevel, customPrompt: userInfo.customPrompt, userLocation: userInfo.userLocation, userName: userInfo.userName, userBio: userInfo.userBio, liquidGlass: userInfo.liquidGlass, customLimits: userInfo.customLimits || null, lastActive: userInfo.lastActive, password: userInfo.password || '' }, { merge: true }).catch(e => console.error(e)); }
-        function saveChatsToFirebase() { try { localStorage.setItem('sundeek_chats_backup', JSON.stringify(chats)); } catch(e){} if(!currentUserEmail || isGhostMode) return; db.collection("users").doc(currentUserEmail).set({ chats: chats }, { merge: true }).catch(e => console.error(e)); }
+        function saveUserInfoToFirebase() { if(!currentUserEmail || isGhostMode || !db) return; userInfo.lastActive = Date.now(); db.collection("users").doc(currentUserEmail).set({ uid: userInfo.uid, tier: userInfo.tier, msgCount: userInfo.msgCount, imgCount: userInfo.imgCount, lastMsgDate: userInfo.lastMsgDate, expireDate: userInfo.expireDate, emojiLevel: userInfo.emojiLevel, customPrompt: userInfo.customPrompt, userLocation: userInfo.userLocation, userName: userInfo.userName, userBio: userInfo.userBio, liquidGlass: userInfo.liquidGlass, customLimits: userInfo.customLimits || null, lastActive: userInfo.lastActive, password: userInfo.password || '' }, { merge: true }).catch(e => console.error(e)); }
+        function saveChatsToFirebase() { try { localStorage.setItem('sundeek_chats_backup', JSON.stringify(chats)); } catch(e){} if(!currentUserEmail || isGhostMode || !db) return; db.collection("users").doc(currentUserEmail).set({ chats: chats }, { merge: true }).catch(e => console.error(e)); }
 
         async function loadDataFromFirebase() {
-            if(!currentUserEmail) return;
+            if(!currentUserEmail || !db) return;
             try {
                 const doc = await db.collection("users").doc(currentUserEmail).get();
                 if (doc.exists) {
@@ -908,7 +919,7 @@ body.liquid-glass #mobile-overlay.active { backdrop-filter: blur(5px); -webkit-b
                 aiLabel.innerText = 'sundeek'; activeChat.messages.push({ role: "assistant", content: fullReply }); saveChatsToFirebase(); aiBox.innerHTML = ''; renderAIResponseFast(fullReply, aiBox); updateInputUI(activeChat); 
             } catch (e) { aiBox.innerText = "Error API: " + e.message; aiLabel.innerText = 'sundeek'; } finally { 
                 isThinking = false; aiLabel.innerText = 'sundeek'; 
-                if (currentTool === 'live' && isLiveActive) { const statusEl = document.getElementById('live-status-indicator'); if(statusEl) statusEl.classList.remove('thinking'); if (!isSpeaking && ttsQueue.length === 0) { document.getElementById('lang-live-listen').innerText = LANG.liveListen; if (!isLiveMuted) { try { recognition.start(); } catch(e){} } } }
+                if (currentTool === 'live' && isLiveActive) { const statusEl = document.getElementById('live-status-indicator'); if(statusEl) statusEl.classList.remove('thinking'); if (!isSpeaking) { document.getElementById('lang-live-listen').innerText = LANG.liveListen; if (!isLiveMuted) { try { recognition.start(); } catch(e){} } } }
                 btn.disabled = false; input.disabled = false; input.focus(); checkInput(); 
             }
         }
